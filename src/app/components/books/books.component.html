@@ -1,0 +1,129 @@
+<form #newBook="ngForm" class="newBook">
+  <h5>Add new Book:</h5>
+  <p
+    *ngIf="newBook.invalid && newBook.submitted"
+    class="alert alert-danger"
+  >
+    The form is not valid. Please check all fields!
+  </p>
+  <div>
+    Title:
+    <input
+      type="text"
+      #title="ngModel"
+      ngModel
+      name="title"
+      required
+      minlength="1"
+      maxlength="200"
+    />
+    <span
+      class="alert alert-warning"
+      *ngIf="title.invalid && newBook.submitted"
+      >Not valid</span
+    >
+  </div>
+
+  <div>
+    Price:
+    <input
+      type="number" min="0.01" max="999.99" step="0.01"
+      #price="ngModel"
+      ngModel
+      name="price"
+      required
+      [valueAsNumber]
+    />
+    <span
+      class="alert alert-warning"
+      *ngIf="price.invalid && newBook.submitted"
+      >Not valid</span
+    >
+  </div>
+
+  <div>
+    Discount price:
+    <input
+      type="number" min="0.00" max="999.99" step="0.01"
+      #discount_price="ngModel"
+      ngModel
+      name="discount_price"
+      required
+      [valueAsNumber]
+    />
+    <span
+      class="alert alert-warning"
+      *ngIf="discount_price.invalid && newBook.submitted"
+      >Not valid</span
+    >
+
+  </div>
+
+  <button type="submit" (click)="addBook()" class="btn btn-success">
+    Add
+  </button>
+</form>
+
+<div class="statistika">
+  <h5>Statistics:</h5>
+  <p>Total books: {{ total_records }}</p>
+  <p>Average price: {{ average_price }}</p>
+
+</div>
+
+<div class="filter">
+  <h5>Filter:</h5>
+  <div>
+    <label>Find book by title:</label>
+    <input type="text" (input)="onFilter($event)" class="filter-input" />
+  </div>
+  <div>
+    <button (click)="onSort('title')" class="btn btn-primary">
+      Sort by Title
+    </button>
+    <button (click)="onSort('price')" class="btn btn-secondary">
+      Sort by Price
+    </button>
+  </div>
+</div>
+
+<!-- <p class="alert alert-warning no-changes" *ngIf="updateError">No changes for update!</p> -->
+<table class='table table-light' *ngIf="filteredBooks.length > 0; else noBooksWarning">
+  <thead class="table-success">
+    <tr>
+      <th>ID <i (click)="onSort('id')" class="fa fa-angle-{{this.field === 'id' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Title <i (click)="onSort('title')" class="fa fa-angle-{{this.field === 'title' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Price <i (click)="onSort('price')" class="fa fa-angle-{{this.field === 'price' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Discount price <i (click)="onSort('discount_price')" class="fa fa-angle-{{this.field === 'discount_price' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Sale <i (click)="onSort('sale')" class="fa fa-angle-{{this.field === 'sale' ? (this.sortAsc ? 'down' : 'up') : 'down'}}"></i></th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of filteredBooks">
+      <td>{{item.id}}</td>
+      <td>{{item.title}}</td>
+      <td>{{item.price}}<br><input type="number" min="0.01" max="999.99" step="0.01" #priceInput="ngModel" name="price" id="price" [(ngModel)]="item.price" ></td>
+      <td>{{item.discount_price}}<br><input type="number" min="0.00" max="999.99" step="0.01" #discount_priceInput="ngModel" name="discount_price" id="discount_price" [(ngModel)]="item.discount_price" ></td>
+      <td>{{item.sale ? "Sale on" : "Sale off"}}<input type="checkbox" #checkInput="ngModel" [(ngModel)]="item.sale" id="checkbox"/></td>
+      <td>
+        <button (click)="onUpdate(item)" class="btn btn-outline-success action">Update</button>
+        <button (click)="onDelete(item.id)" class="btn btn-outline-danger action">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot class="table-success">
+    <tr>
+      <td>Total books: {{total_records}}</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td *ngIf="recordsLoaded">Average price: {{average_price}}</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+<ng-template #noBooksWarning>
+  <p *ngIf="dataLoaded" class="alert alert-warning">Sorry, no books - no data!</p>
+</ng-template>
+
